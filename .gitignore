@@ -23,3 +23,8 @@ obj
 
 # Tests
 build
+
+.cache/
+.fable/
+dist/
+**/*.fs.js

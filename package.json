@@ -2,37 +2,24 @@
   "name": "real-world-fable",
   "version": "1.0.0",
   "description": "> ### Fable and F# codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.",
-  "main": "webpack.config.js",
   "dependencies": {
     "markdown": "^0.5.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
-    "babel-loader": "^8.0.6",
-    "copy-webpack-plugin": "^5.1.1",
-    "core-js": "^3.3.4",
-    "fable-compiler": "^2.4.7",
-    "fable-loader": "^2.1.8",
-    "fable-splitter": "^2.1.11",
-    "html-webpack-plugin": "^3.2.0",
     "mocha": "^6.2.2",
-    "npm-run-all": "^4.1.5",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9",
-    "webpack-dev-server": "^3.9.0"
+    "fuse-box": "4.0.0"
   },
   "scripts": {
-    "start": "webpack-dev-server",
-    "postinstall": "dotnet restore src/RealWorldFable.fsproj",
-    "build": "npm test && webpack",
-    "pretest": "fable-splitter tests -o build --commonjs",
-    "test": "mocha build -t 10000",
-    "test:watch": "rm -rf build && npm run pretest && npm-run-all --parallel watch:*",
-    "watch:pretest": "fable-splitter tests -o build --commonjs -w",
-    "watch:test": "mocha build --watch"
+    "prestart": "dotnet tool restore",
+    "start": "dotnet fable watch ./src --run node ./fusebox.js watch",
+    "prebuild": "dotnet tool restore",
+    "build": "dotnet fable ./src && node ./fusebox.js prod",
+    "test:live": "dotnet fable watch tests --run node ./fusebox.js test watch",
+    "build:test": "dotnet fable tests && node ./fusebox.js test",
+    "pretest": "dotnet tool restore",
+    "test": "dotnet fable tests --outDir dist/tests && mocha dist/tests -r esm"
   },
   "repository": {
     "type": "git",
