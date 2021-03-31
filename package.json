@@ -4,20 +4,27 @@
   "description": "> ### Fable and F# codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.",
   "dependencies": {
     "markdown": "^0.5.0",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0"
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
   },
   "devDependencies": {
     "mocha": "^6.2.2",
-    "fuse-box": "4.0.0"
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-proposal-decorators": "^7.10.5",
+    "@babel/preset-typescript": "^7.10.4",
+    "@snowpack/plugin-babel": "^2.1.6",
+    "@snowpack/plugin-dotenv": "^2.0.5",
+    "@snowpack/plugin-react-refresh": "^2.4.0",
+    "@types/snowpack-env": "^2.3.2",
+    "snowpack": "3.0.13"
   },
   "scripts": {
     "prestart": "dotnet tool restore",
-    "start": "dotnet fable watch ./src --run node ./fusebox.js watch",
+    "start": "dotnet fable watch ./src --run snowpack dev",
     "prebuild": "dotnet tool restore",
-    "build": "dotnet fable ./src && node ./fusebox.js prod",
-    "test:live": "dotnet fable watch tests --run node ./fusebox.js test watch",
-    "build:test": "dotnet fable tests && node ./fusebox.js test",
+    "build": "dotnet fable ./src && snowpack build",
+    "test:live": "echo 'not implemented yet'",
+    "build:test": "echo 'not implemented yet'",
     "pretest": "dotnet tool restore",
     "test": "dotnet fable tests --outDir dist/tests && mocha dist/tests -r esm"
   },
