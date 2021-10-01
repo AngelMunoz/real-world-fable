@@ -16,7 +16,12 @@
     />
     <!-- Import the custom Bootstrap 4 theme from our hosted CDN -->
     <link rel="stylesheet" href="//demo.productionready.io/main.css" />
-    <link rel="shortcut icon" href="fable.ico" />
+    <link rel="shortcut icon" href="./src/fable.ico" />
+    <script
+      async
+      src="https://ga.jspm.io/npm:es-module-shims@1.0.0/dist/es-module-shims.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
 
   <body>
@@ -31,5 +36,6 @@
         </span>
       </div>
     </footer>
-  <script type="text/javascript" src="vendors.744ef2262a696af0cfcf.js"></script><script type="text/javascript" src="main.744ef2262a696af0cfcf.js"></script></body>
+    <script data-entry-point src="./src/App.fs.js" type="module"></script>
+  </body>
 </html>

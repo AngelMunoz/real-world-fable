@@ -6,17 +6,19 @@ open Fable.SimpleHttp
 
 open Types
 
-let private baseUrl = "https://conduit.productionready.io/api/"
+let private baseUrl = "https://api.realworld.io/api/"
 
 
 let private badRequestErrorDecoder str =
     str
-    |> Decode.at [ "errors" ]
-           (Decode.dict (Decode.list Decode.string)
-            |> Decode.andThen
-                (Map.toList
-                 >> List.collect (fun (key, errors) -> List.map (fun e -> sprintf "%s %s" key e) errors)
-                 >> Decode.succeed))
+    |> Decode.at
+        [ "errors" ]
+        (Decode.dict (Decode.list Decode.string)
+         |> Decode.andThen (
+             Map.toList
+             >> List.collect (fun (key, errors) -> List.map (fun e -> sprintf "%s %s" key e) errors)
+             >> Decode.succeed
+         ))
 // The errors are returned as a key/pair value of string * string list
 // So converting all errors as just a simple string list
 
@@ -26,28 +28,38 @@ let private makeRequest method url decoder session body =
 
         let request =
             session
-            |> Option.map (fun s -> Http.header (Headers.authorization <| sprintf "Token %s" s.Token) request)
+            |> Option.map
+                (fun s ->
+                    Http.header
+                        (Headers.authorization
+                         <| sprintf "Token %s" s.Token)
+                        request)
             |> Option.defaultValue request
 
         let request =
             body
             |> Option.map
                 (fun b ->
-                Http.content (BodyContent.Text b) request |> Http.header (Headers.contentType "application/json"))
+                    Http.content (BodyContent.Text b) request
+                    |> Http.header (Headers.contentType "application/json"))
             |> Option.defaultValue request
 
         let! response = Http.send request
 
         match response.statusCode with
         | 200 ->
-            let decodedValue = Decode.fromString decoder response.responseText
+            let decodedValue =
+                Decode.fromString decoder response.responseText
+
             match decodedValue with
             | Ok value -> return Success value
 
             | Error e -> return Failure [ e ]
 
         | 422 ->
-            let decodedErrors = Decode.fromString badRequestErrorDecoder response.responseText
+            let decodedErrors =
+                Decode.fromString badRequestErrorDecoder response.responseText
+
             match decodedErrors with
             | Ok errors -> return Failure errors
 
@@ -57,26 +69,32 @@ let private makeRequest method url decoder session body =
     }
 
 
-let private safeGet url decoder session = makeRequest GET url decoder (Some session) None
+let private safeGet url decoder session =
+    makeRequest GET url decoder (Some session) None
 
 
-let private safeDelete url decoder session = makeRequest DELETE url decoder (Some session) None
+let private safeDelete url decoder session =
+    makeRequest DELETE url decoder (Some session) None
 
 
 let private safeChange method (body: JsonValue) url decoder session =
-    Some(Encode.toString 0 body) |> makeRequest method url decoder (Some session)
+    Some(Encode.toString 0 body)
+    |> makeRequest method url decoder (Some session)
 
 
 let private safePut url decoder session (body: JsonValue) = safeChange PUT body url decoder session
 
 
-let private safePost url decoder session (body: JsonValue) = safeChange POST body url decoder session
+let private safePost url decoder session (body: JsonValue) =
+    safeChange POST body url decoder session
 
 
 let private get url decoder = makeRequest GET url decoder None None
 
 
-let private post url decoder body = Some(Encode.toString 0 body) |> makeRequest POST url decoder None
+let private post url decoder body =
+    Some(Encode.toString 0 body)
+    |> makeRequest POST url decoder None
 
 module Articles =
 
@@ -85,77 +103,115 @@ module Articles =
 
     let fetchArticlesWithTag (payload: {| Tag: Tag; Offset: int |}) =
         let (Tag tag) = payload.Tag
-        let url = sprintf "%s?tag=%s&limit=10&offset=%i" articlesBaseUrl tag payload.Offset
+
+        let url =
+            sprintf "%s?tag=%s&limit=10&offset=%i" articlesBaseUrl tag payload.Offset
+
         get url Article.ArticlesList.Decoder
 
 
     let fetchArticles offset =
-        let url = sprintf "%s?limit=10&offset=%i" articlesBaseUrl offset
+        let url =
+            sprintf "%s?limit=10&offset=%i" articlesBaseUrl offset
+
         get url Article.ArticlesList.Decoder
 
 
     let fetchArticle slug =
-        let url = sprintf "%s/%s" articlesBaseUrl slug
+        let url = sprintf "%s%s" articlesBaseUrl slug
         get url (Decode.field "article" FullArticle.Decoder)
 
     let fetchArticleWithSession (payload: {| Session: Session; Slug: string |}) =
-        let url = sprintf "%s/%s" articlesBaseUrl payload.Slug
+        let url =
+            sprintf "%s%s" articlesBaseUrl payload.Slug
+
         safeGet url (Decode.field "article" FullArticle.Decoder) payload.Session
 
 
     let fetchFeed (payload: {| Session: Session; Offset: int |}) =
-        let url = sprintf "%sfeed?limit=10&offset=%i" articlesBaseUrl payload.Offset
+        let url =
+            sprintf "%sfeed?limit=10&offset=%i" articlesBaseUrl payload.Offset
+
         safeGet url Article.ArticlesList.Decoder payload.Session
 
 
     let fetchComments slug =
-        let url = sprintf "%s/%s/comments" articlesBaseUrl slug
+        let url =
+            sprintf "%s/%s/comments" articlesBaseUrl slug
+
         get url Comment.DecoderList
 
 
     let createArticle session (article: Article.ValidatedArticle) =
-        Article.validatedToJson article |> safePost articlesBaseUrl (Decode.field "article" FullArticle.Decoder) session
+        Article.validatedToJson article
+        |> safePost articlesBaseUrl (Decode.field "article" FullArticle.Decoder) session
 
 
     let updateArticle session (slug, article: Article.ValidatedArticle) =
         let url = sprintf "%s/%s" articlesBaseUrl slug
-        Article.validatedToJson article |> safePut url (Decode.field "article" FullArticle.Decoder) session
+
+        Article.validatedToJson article
+        |> safePut url (Decode.field "article" FullArticle.Decoder) session
 
 
-    let createComment (payload: {| Session: Session; Slug: string; CommentBody: string |}) =
-        let url = sprintf "%s/%s/comments" articlesBaseUrl payload.Slug
-        let comment = Encode.object [ ("body", Encode.string payload.CommentBody) ]
+    let createComment
+        (payload: {| Session: Session
+                     Slug: string
+                     CommentBody: string |})
+        =
+        let url =
+            sprintf "%s/%s/comments" articlesBaseUrl payload.Slug
+
+        let comment =
+            Encode.object [ ("body", Encode.string payload.CommentBody) ]
+
         safePost url (Decode.field "comment" Comment.Decoder) payload.Session {| comment = comment |}
 
 
-    let favoriteArticle (payload: {| Session: Session; Article: FullArticle |}) =
-        let url = sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
+    let favoriteArticle
+        (payload: {| Session: Session
+                     Article: FullArticle |})
+        =
+        let url =
+            sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
+
         safePost url (Decode.field "article" FullArticle.Decoder) payload.Session ""
 
 
-    let unfavoriteArticle (payload: {| Session: Session; Article: FullArticle |}) =
-        let url = sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
+    let unfavoriteArticle
+        (payload: {| Session: Session
+                     Article: FullArticle |})
+        =
+        let url =
+            sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
+
         safeDelete url (Decode.field "article" FullArticle.Decoder) payload.Session
 
 
     let fetchArticlesFromAuthor author =
-        let url = sprintf "%s?author=%s&limit=10&offset=%i" articlesBaseUrl author 0
+        let url =
+            sprintf "%s?author=%s&limit=10&offset=%i" articlesBaseUrl author 0
+
         get url Article.ArticlesList.Decoder
 
 
     let deleteArticle (payload: {| Session: Session; Slug: string |}) =
-        let url = sprintf "%s/%s" articlesBaseUrl payload.Slug
-        safeDelete url (Decode.succeed()) payload.Session
+        let url =
+            sprintf "%s/%s" articlesBaseUrl payload.Slug
+
+        safeDelete url (Decode.succeed ()) payload.Session
 
 
     let fetchFavoriteArticles (author: Author) =
-        let url = sprintf "%s?favorited=%s&limit=10&offset=%i" articlesBaseUrl author.Username 0
+        let url =
+            sprintf "%s?favorited=%s&limit=10&offset=%i" articlesBaseUrl author.Username 0
+
         get url Article.ArticlesList.Decoder
 
 
 module Tags =
 
-    let fetchTags() =
+    let fetchTags () =
         let url = sprintf "%stags" baseUrl
         get url Tag.ListDecoder
 
@@ -165,7 +221,11 @@ module Users =
     let usersBaseUrl = sprintf "%susers/" baseUrl
 
 
-    let createUser (createUser: {| username: string; email: string; password: string |}) =
+    let createUser
+        (createUser: {| username: string
+                        email: string
+                        password: string |})
+        =
         post usersBaseUrl (Decode.field "user" Session.Decoder) {| user = createUser |}
 
 
@@ -179,23 +239,32 @@ module Users =
         safeGet url (Decode.field "user" decoder) session
 
 
-    let fetchUser session = fetchUserWithDecoder User.Decoder session
+    let fetchUser session =
+        fetchUserWithDecoder User.Decoder session
 
 
     let updateUser session (validatedUser: User.ValidatedUser, password) =
         let url = sprintf "%suser/" baseUrl
-        User.validatedToJsonValue validatedUser password |> safePut url (Decode.field "user" User.Decoder) session
+
+        User.validatedToJsonValue validatedUser password
+        |> safePut url (Decode.field "user" User.Decoder) session
 
 
 module Profiles =
     let fetchProfile username =
-        let url = sprintf "%sprofiles/%s/" baseUrl username
+        let url =
+            sprintf "%sprofiles/%s/" baseUrl username
+
         get url (Decode.field "profile" Author.Decoder)
 
     let createFollower (payload: {| Session: Session; Author: Author |}) =
-        let url = sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
+        let url =
+            sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
+
         safePost url (Decode.field "profile" Author.Decoder) payload.Session ""
 
     let deleteFollower (payload: {| Session: Session; Author: Author |}) =
-        let url = sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
+        let url =
+            sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
+
         safeDelete url (Decode.field "profile" Author.Decoder) payload.Session

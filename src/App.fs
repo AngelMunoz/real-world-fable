@@ -1,7 +1,7 @@
 module App
 
 open Elmish
-open Elmish.HMR
+open Elmish.React
 open Elmish.Navigation
 open Thoth.Json
 
@@ -13,7 +13,10 @@ open RootView
 let private tryGetSessionFromLocalStorage =
     Browser.WebStorage.localStorage.getItem "session"
     |> Option.ofObj
-    |> Option.bind (Decode.fromString Session.Decoder >> Result.toOption)
+    |> Option.bind (
+        Decode.fromString Session.Decoder
+        >> Result.toOption
+    )
 
 
 Program.mkProgram (init tryGetSessionFromLocalStorage) update rootView

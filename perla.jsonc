@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AngelMunoz/Perla/main/perla.schema.json",
+  "index": "./index.html",
+  "fable": {
+    "project": "./src/RealWorldFable.fsproj"
+  },
+  "devServer": {
+    "autoStart": true,
+    "port": 7331,
+    "mountDirectories": {
+      "./src": "/src"
+    },
+    "watchConfig": {
+      "extensions": [
+        "*.js",
+        "*.css"
+      ],
+      "directories": [
+        "./src"
+      ]
+    },
+    "liveReload": true,
+    "useSSL": false
+  },
+  "build": {
+    "esbuildVersion": "0.13.2",
+    "target": "es2017",
+    "bundle": true,
+    "format": "esm",
+    "minify": true
+  },
+  "packages": {
+    "markdown": "https://cdn.skypack.dev/pin/markdown@v0.5.0-4h23fEcARJHH7tr7ulWv/mode=imports/optimized/markdown.js",
+    "react": "https://cdn.skypack.dev/pin/react@v17.0.1-yH0aYV1FOvoIPeKBbHxg/mode=imports/optimized/react.js",
+    "react-dom": "https://cdn.skypack.dev/pin/react-dom@v17.0.1-oZ1BXZ5opQ1DbTh7nu9r/mode=imports/optimized/react-dom.js"
+  }
+}
