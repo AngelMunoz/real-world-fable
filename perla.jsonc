@@ -6,20 +6,10 @@
   },
   "devServer": {
     "autoStart": true,
-    "port": 7331,
+    "liveReload": true,
     "mountDirectories": {
       "./src": "/src"
     },
-    "watchConfig": {
-      "extensions": [
-        "*.js",
-        "*.css"
-      ],
-      "directories": [
-        "./src"
-      ]
-    },
-    "liveReload": true,
     "useSSL": false
   },
   "build": {
