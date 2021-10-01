@@ -4,6 +4,8 @@
 
 > ### [Fable](https://fable.io), [Elmish](https://elmish.github.io/elmish/) and [F#](https://fsharp.org) codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 
+> This is now one of my testing repositories for [Perla](https://github.com/AngelMunoz/Perla) the .NET dev server for frontend development :)
+
 
 ### [Demo](https://real-world-fable.netlify.com/)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
 
@@ -25,22 +27,20 @@ For more information on how to this works with other frontends/backends, head ov
 
 You're going to need a few things installed:
 
-- [.Net core](https://dotnet.microsoft.com/download)
+- [.Net 5/6](https://dotnet.microsoft.com/download)
 - [F#](https://fsharp.org/)
-- [Node](https://nodejs.org)
 
 ## Development Build
 
-`npm start`
+- `dotnet tool restore`
+- `dotnet perla serve
 
-And open a browser tab on *http://localhost:8080*
+And open a browser tab on *http://localhost:7331*
 
 ## Production Build
 
-`npm run build`
+- `dotnet perla build`
 
 ## Running the tests
 
-`npm test`
-
-Or, to run the tests in watch mode `npm run test:watch`
+Pending...
