@@ -5,19 +5,10 @@
     "project": "./src/RealWorldFable.fsproj"
   },
   "devServer": {
-    "autoStart": true,
     "liveReload": true,
     "mountDirectories": {
       "./src": "/src"
-    },
-    "useSSL": false
-  },
-  "build": {
-    "esbuildVersion": "0.13.2",
-    "target": "es2017",
-    "bundle": true,
-    "format": "esm",
-    "minify": true
+    }
   },
   "packages": {
     "markdown": "https://cdn.skypack.dev/pin/markdown@v0.5.0-4h23fEcARJHH7tr7ulWv/mode=imports/optimized/markdown.js",
