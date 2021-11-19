@@ -1,8 +1,8 @@
 {
   "imports": {
-    "markdown": "https://cdn.skypack.dev/pin/markdown@v0.5.0-4h23fEcARJHH7tr7ulWv/mode=imports/optimized/markdown.js",
-    "react": "https://cdn.skypack.dev/pin/react@v17.0.1-yH0aYV1FOvoIPeKBbHxg/mode=imports/optimized/react.js",
-    "react-dom": "https://cdn.skypack.dev/pin/react-dom@v17.0.1-oZ1BXZ5opQ1DbTh7nu9r/mode=imports/optimized/react-dom.js"
+    "markdown": "https://cdn.skypack.dev/pin/markdown@v0.5.0-4h23fEcARJHH7tr7ulWv/mode=imports,min/optimized/markdown.js",
+    "react": "https://cdn.skypack.dev/pin/react@v17.0.1-yH0aYV1FOvoIPeKBbHxg/mode=imports,min/optimized/react.js",
+    "react-dom": "https://cdn.skypack.dev/pin/react-dom@v17.0.1-oZ1BXZ5opQ1DbTh7nu9r/mode=imports,min/optimized/react-dom.js"
   },
   "scopes": {}
 }
