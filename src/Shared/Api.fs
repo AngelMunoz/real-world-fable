@@ -6,7 +6,7 @@ open Fable.SimpleHttp
 
 open Types
 
-let private baseUrl = "https://api.realworld.io/api/"
+let private baseUrl = "https://api.realworld.build/api/"
 
 
 let private badRequestErrorDecoder str =
@@ -28,28 +28,21 @@ let private makeRequest method url decoder session body =
 
         let request =
             session
-            |> Option.map
-                (fun s ->
-                    Http.header
-                        (Headers.authorization
-                         <| sprintf "Token %s" s.Token)
-                        request)
+            |> Option.map (fun s -> Http.header (Headers.authorization <| sprintf "Token %s" s.Token) request)
             |> Option.defaultValue request
 
         let request =
             body
-            |> Option.map
-                (fun b ->
-                    Http.content (BodyContent.Text b) request
-                    |> Http.header (Headers.contentType "application/json"))
+            |> Option.map (fun b ->
+                Http.content (BodyContent.Text b) request
+                |> Http.header (Headers.contentType "application/json"))
             |> Option.defaultValue request
 
         let! response = Http.send request
 
         match response.statusCode with
         | 200 ->
-            let decodedValue =
-                Decode.fromString decoder response.responseText
+            let decodedValue = Decode.fromString decoder response.responseText
 
             match decodedValue with
             | Ok value -> return Success value
@@ -57,8 +50,7 @@ let private makeRequest method url decoder session body =
             | Error e -> return Failure [ e ]
 
         | 422 ->
-            let decodedErrors =
-                Decode.fromString badRequestErrorDecoder response.responseText
+            let decodedErrors = Decode.fromString badRequestErrorDecoder response.responseText
 
             match decodedErrors with
             | Ok errors -> return Failure errors
@@ -78,8 +70,7 @@ let private safeDelete url decoder session =
 
 
 let private safeChange method (body: JsonValue) url decoder session =
-    Some(Encode.toString 0 body)
-    |> makeRequest method url decoder (Some session)
+    Some(Encode.toString 0 body) |> makeRequest method url decoder (Some session)
 
 
 let private safePut url decoder session (body: JsonValue) = safeChange PUT body url decoder session
@@ -93,8 +84,7 @@ let private get url decoder = makeRequest GET url decoder None None
 
 
 let private post url decoder body =
-    Some(Encode.toString 0 body)
-    |> makeRequest POST url decoder None
+    Some(Encode.toString 0 body) |> makeRequest POST url decoder None
 
 module Articles =
 
@@ -104,15 +94,13 @@ module Articles =
     let fetchArticlesWithTag (payload: {| Tag: Tag; Offset: int |}) =
         let (Tag tag) = payload.Tag
 
-        let url =
-            sprintf "%s?tag=%s&limit=10&offset=%i" articlesBaseUrl tag payload.Offset
+        let url = sprintf "%s?tag=%s&limit=10&offset=%i" articlesBaseUrl tag payload.Offset
 
         get url Article.ArticlesList.Decoder
 
 
     let fetchArticles offset =
-        let url =
-            sprintf "%s?limit=10&offset=%i" articlesBaseUrl offset
+        let url = sprintf "%s?limit=10&offset=%i" articlesBaseUrl offset
 
         get url Article.ArticlesList.Decoder
 
@@ -122,22 +110,19 @@ module Articles =
         get url (Decode.field "article" FullArticle.Decoder)
 
     let fetchArticleWithSession (payload: {| Session: Session; Slug: string |}) =
-        let url =
-            sprintf "%s%s" articlesBaseUrl payload.Slug
+        let url = sprintf "%s%s" articlesBaseUrl payload.Slug
 
         safeGet url (Decode.field "article" FullArticle.Decoder) payload.Session
 
 
     let fetchFeed (payload: {| Session: Session; Offset: int |}) =
-        let url =
-            sprintf "%sfeed?limit=10&offset=%i" articlesBaseUrl payload.Offset
+        let url = sprintf "%sfeed?limit=10&offset=%i" articlesBaseUrl payload.Offset
 
         safeGet url Article.ArticlesList.Decoder payload.Session
 
 
     let fetchComments slug =
-        let url =
-            sprintf "%s/%s/comments" articlesBaseUrl slug
+        let url = sprintf "%s/%s/comments" articlesBaseUrl slug
 
         get url Comment.DecoderList
 
@@ -155,49 +140,46 @@ module Articles =
 
 
     let createComment
-        (payload: {| Session: Session
-                     Slug: string
-                     CommentBody: string |})
+        (payload:
+            {| Session: Session
+               Slug: string
+               CommentBody: string |})
         =
-        let url =
-            sprintf "%s/%s/comments" articlesBaseUrl payload.Slug
+        let url = sprintf "%s/%s/comments" articlesBaseUrl payload.Slug
 
-        let comment =
-            Encode.object [ ("body", Encode.string payload.CommentBody) ]
+        let comment = Encode.object [ ("body", Encode.string payload.CommentBody) ]
 
         safePost url (Decode.field "comment" Comment.Decoder) payload.Session {| comment = comment |}
 
 
     let favoriteArticle
-        (payload: {| Session: Session
-                     Article: FullArticle |})
+        (payload:
+            {| Session: Session
+               Article: FullArticle |})
         =
-        let url =
-            sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
+        let url = sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
 
         safePost url (Decode.field "article" FullArticle.Decoder) payload.Session ""
 
 
     let unfavoriteArticle
-        (payload: {| Session: Session
-                     Article: FullArticle |})
+        (payload:
+            {| Session: Session
+               Article: FullArticle |})
         =
-        let url =
-            sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
+        let url = sprintf "%s/%s/favorite" articlesBaseUrl payload.Article.Slug
 
         safeDelete url (Decode.field "article" FullArticle.Decoder) payload.Session
 
 
     let fetchArticlesFromAuthor author =
-        let url =
-            sprintf "%s?author=%s&limit=10&offset=%i" articlesBaseUrl author 0
+        let url = sprintf "%s?author=%s&limit=10&offset=%i" articlesBaseUrl author 0
 
         get url Article.ArticlesList.Decoder
 
 
     let deleteArticle (payload: {| Session: Session; Slug: string |}) =
-        let url =
-            sprintf "%s/%s" articlesBaseUrl payload.Slug
+        let url = sprintf "%s/%s" articlesBaseUrl payload.Slug
 
         safeDelete url (Decode.succeed ()) payload.Session
 
@@ -222,9 +204,10 @@ module Users =
 
 
     let createUser
-        (createUser: {| username: string
-                        email: string
-                        password: string |})
+        (createUser:
+            {| username: string
+               email: string
+               password: string |})
         =
         post usersBaseUrl (Decode.field "user" Session.Decoder) {| user = createUser |}
 
@@ -252,19 +235,16 @@ module Users =
 
 module Profiles =
     let fetchProfile username =
-        let url =
-            sprintf "%sprofiles/%s/" baseUrl username
+        let url = sprintf "%sprofiles/%s/" baseUrl username
 
         get url (Decode.field "profile" Author.Decoder)
 
     let createFollower (payload: {| Session: Session; Author: Author |}) =
-        let url =
-            sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
+        let url = sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
 
         safePost url (Decode.field "profile" Author.Decoder) payload.Session ""
 
     let deleteFollower (payload: {| Session: Session; Author: Author |}) =
-        let url =
-            sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
+        let url = sprintf "%sprofiles/%s/follow" baseUrl payload.Author.Username
 
         safeDelete url (Decode.field "profile" Author.Decoder) payload.Session

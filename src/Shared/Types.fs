@@ -16,12 +16,8 @@ type Author =
         <| fun get ->
             { Username = get.Required.Field "username" Decode.string
               Bio = get.Optional.Field "bio" Decode.string
-              Image =
-                  (get.Optional.Field "image" Decode.string)
-                  |> Option.defaultValue ""
-              Following =
-                  (get.Optional.Field "following" Decode.bool)
-                  |> Option.defaultValue false }
+              Image = (get.Optional.Field "image" Decode.string) |> Option.defaultValue ""
+              Following = (get.Optional.Field "following" Decode.bool) |> Option.defaultValue false }
 
 
 type Session =
@@ -70,8 +66,8 @@ type FullArticle =
               Description = get.Required.Field "description" Decode.string
               Body = get.Required.Field "body" Decode.string
               TagList = get.Required.Field "tagList" (Decode.list Decode.string)
-              CreatedAt = get.Required.Field "createdAt" Decode.datetime
-              UpdatedAt = get.Required.Field "updatedAt" Decode.datetime
+              CreatedAt = get.Required.Field "createdAt" Decode.datetimeUtc
+              UpdatedAt = get.Required.Field "updatedAt" Decode.datetimeUtc
               Favorited = get.Required.Field "favorited" Decode.bool
               FavoritesCount = get.Required.Field "favoritesCount" Decode.int
               Author = get.Required.Field "author" Author.Decoder }
@@ -81,19 +77,16 @@ module User =
     type ValidatedUser = private ValidatedUser of User
 
     let validatedToJsonValue (ValidatedUser user) (password: string) : Thoth.Json.JsonValue =
-        Encode.object [ "username", Encode.string user.Username
-                        "email", Encode.string user.Email
-                        "bio",
-                        Option.map Encode.string user.Bio
-                        |> Option.defaultValue Encode.nil
-                        "image",
-                        Option.map Encode.string user.Image
-                        |> Option.defaultValue Encode.nil
-                        "password",
-                        (if String.IsNullOrWhiteSpace password then
-                             Encode.nil
-                         else
-                             Encode.string password) ]
+        Encode.object
+            [ "username", Encode.string user.Username
+              "email", Encode.string user.Email
+              "bio", Option.map Encode.string user.Bio |> Option.defaultValue Encode.nil
+              "image", Option.map Encode.string user.Image |> Option.defaultValue Encode.nil
+              "password",
+              (if String.IsNullOrWhiteSpace password then
+                   Encode.nil
+               else
+                   Encode.string password) ]
 
     let validateUser (user: User) =
         let isUsernameEmpty user =
@@ -117,9 +110,9 @@ module User =
 
 type Tag =
     | Tag of string
+
     static member Decoder: Decoder<Tag> =
-        Decode.object
-        <| fun get -> Tag <| get.Required.Raw Decode.string
+        Decode.object <| fun get -> Tag <| get.Required.Raw Decode.string
 
     static member ListDecoder: Decoder<Tag list> =
         Decode.object (fun get -> get.Required.At [ "tags" ] (Decode.list Tag.Decoder))
@@ -135,14 +128,11 @@ module Article =
     type ValidatedArticle = private ValidatedArticle of Article
 
     let validateArticle (simplifiedArticle: Article) =
-        let isTitleEmpty =
-            isEmpty "title can't be empty" (fun a -> a.Title)
+        let isTitleEmpty = isEmpty "title can't be empty" (fun a -> a.Title)
 
-        let isDescriptionEmpty =
-            isEmpty "description can't be empty" (fun a -> a.Body)
+        let isDescriptionEmpty = isEmpty "description can't be empty" (fun a -> a.Body)
 
-        let isBodyEmpty =
-            isEmpty "body can't be empty" (fun a -> a.Description)
+        let isBodyEmpty = isEmpty "body can't be empty" (fun a -> a.Description)
 
         simplifiedArticle
         |> isTitleEmpty
@@ -151,15 +141,11 @@ module Article =
         |> Result.map ValidatedArticle
 
     let validatedToJson (ValidatedArticle article) =
-        Encode.object [ "title", Encode.string article.Title
-                        "description", Encode.string article.Description
-                        "body", Encode.string article.Body
-                        "tagList",
-                        Encode.list (
-                            article.TagList
-                            |> Set.toList
-                            |> List.map Encode.string
-                        ) ]
+        Encode.object
+            [ "title", Encode.string article.Title
+              "description", Encode.string article.Description
+              "body", Encode.string article.Body
+              "tagList", Encode.list (article.TagList |> Set.toList |> List.map Encode.string) ]
 
 
     type ArticlesList =
@@ -184,8 +170,8 @@ type Comment =
         Decode.object
         <| fun get ->
             { Id = get.Required.Field "id" Decode.int
-              CreatedAt = get.Required.Field "createdAt" Decode.datetime
-              UpdatedAt = get.Required.Field "updatedAt" Decode.datetime
+              CreatedAt = get.Required.Field "createdAt" Decode.datetimeUtc
+              UpdatedAt = get.Required.Field "updatedAt" Decode.datetimeUtc
               Body = get.Required.Field "body" Decode.string
               Author = get.Required.Field "author" Author.Decoder }
 
