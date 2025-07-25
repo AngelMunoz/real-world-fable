@@ -1,0 +1,15 @@
+{
+  "imports": {
+    "markdown": "https://ga.jspm.io/npm:markdown@0.5.0/lib/index.js",
+    "react": "https://ga.jspm.io/npm:react@19.1.0/index.js",
+    "react-dom": "https://ga.jspm.io/npm:react-dom@19.1.0/index.js",
+    "react-dom/client": "https://ga.jspm.io/npm:react-dom@19.1.0/client.js",
+    "react/jsx-runtime": "https://ga.jspm.io/npm:react@19.1.0/jsx-runtime.js"
+  },
+  "scopes": {
+    "https://ga.jspm.io/": {
+      "scheduler": "https://ga.jspm.io/npm:scheduler@0.26.0/index.js",
+      "util": "https://ga.jspm.io/npm:@jspm/core@2.1.0/nodelibs/browser/util.js"
+    }
+  }
+}

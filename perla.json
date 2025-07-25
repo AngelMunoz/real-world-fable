@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AngelMunoz/Perla/dev/perla.schema.json",
+  "schema-version": "2025-07",
+  "fable": {
+    "project": "./src/RealWorldFable.fsproj"
+  },
+  "dependencies": {
+    "markdown": "0.5.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-dom/client": "19.1.0",
+    "react/jsx-runtime": "19.1.0"
+  }
+}
