@@ -11,12 +11,9 @@ open State
 open RootView
 
 let private tryGetSessionFromLocalStorage =
-    Browser.WebStorage.localStorage.getItem "session"
-    |> Option.ofObj
-    |> Option.bind (
-        Decode.fromString Session.Decoder
-        >> Result.toOption
-    )
+  Browser.WebStorage.localStorage.getItem "session"
+  |> Option.ofObj
+  |> Option.bind(Decode.fromString Session.Decoder >> Result.toOption)
 
 
 Program.mkProgram (init tryGetSessionFromLocalStorage) update rootView

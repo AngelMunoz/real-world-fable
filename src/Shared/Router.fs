@@ -5,65 +5,60 @@ open Elmish.Navigation
 open Fable.React.Props
 
 type SessionRoute =
-    | Settings
-    | NewArticle
-    | EditArticle of string
-    | Logout
+  | Settings
+  | NewArticle
+  | EditArticle of string
+  | Logout
 
 type Route =
-    | Login
-    | Register
-    | Article of string
-    | Articles
-    | Profile of string
-    | SessionRoute of SessionRoute
+  | Login
+  | Register
+  | Article of string
+  | Articles
+  | Profile of string
+  | SessionRoute of SessionRoute
 
 
 let pageParser: Parser<Route -> Route, Route> =
-    oneOf
-        [ map Article (s "article" </> str)
-          map Articles top
-          map Login (s "login")
-          map Register (s "register")
-          map (Settings |> SessionRoute) (s "settings")
-          map (NewArticle |> SessionRoute) (s "editor")
-          map (EditArticle >> SessionRoute) (s "editor" </> str)
-          map Profile (s "profile" </> str)
-          map (Logout |> SessionRoute) (s "logout") ]
+  oneOf [
+    map Article (s "article" </> str)
+    map Articles top
+    map Login (s "login")
+    map Register (s "register")
+    map (Settings |> SessionRoute) (s "settings")
+    map (NewArticle |> SessionRoute) (s "editor")
+    map (EditArticle >> SessionRoute) (s "editor" </> str)
+    map Profile (s "profile" </> str)
+    map (Logout |> SessionRoute) (s "logout")
+  ]
 
 
 let toHash route =
-    match route with
-    | Articles -> ""
+  match route with
+  | Articles -> ""
 
-    | Article slug -> sprintf "article/%s" slug
+  | Article slug -> sprintf "article/%s" slug
 
-    | Login -> "login"
+  | Login -> "login"
 
-    | Register -> "register"
+  | Register -> "register"
 
-    | SessionRoute Settings -> "settings"
+  | SessionRoute Settings -> "settings"
 
-    | SessionRoute NewArticle -> "editor"
+  | SessionRoute NewArticle -> "editor"
 
-    | Profile username -> sprintf "profile/%s" username
+  | Profile username -> sprintf "profile/%s" username
 
-    | SessionRoute Logout -> "logout"
+  | SessionRoute Logout -> "logout"
 
-    | SessionRoute(EditArticle slug) -> sprintf "editor/%s" slug
-    |> (fun r -> sprintf "#/%s" r)
+  | SessionRoute(EditArticle slug) -> sprintf "editor/%s" slug
+  |> (fun r -> sprintf "#/%s" r)
 
 
 let href = toHash >> Href
 
 
-let modifyUrl route =
-    route
-    |> toHash
-    |> Navigation.modifyUrl
+let modifyUrl route = route |> toHash |> Navigation.modifyUrl
 
 
-let newUrl route =
-    route
-    |> toHash
-    |> Navigation.newUrl
+let newUrl route = route |> toHash |> Navigation.newUrl
