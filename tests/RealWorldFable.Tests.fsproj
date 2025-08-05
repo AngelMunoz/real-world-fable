@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Adapters.fs" />
-    <Compile Include="ArticleTests.fs" />
+    <Compile Include="Article.Test.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fable.Core" Version="3.1.2" />
+    <PackageReference Include="Fable.Core" Version="4.5.0" />
+    <PackageReference Include="Perla.Fable.Mocha" Version="1.0.0-beta-034" />
   </ItemGroup>
 
   <ItemGroup>

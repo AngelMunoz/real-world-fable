@@ -4,6 +4,12 @@
   "fable": {
     "project": "./src/RealWorldFable.fsproj"
   },
+  "testing": {
+    "fable": {
+      "project": "./tests/RealWorldFable.Tests.fsproj"
+    },
+    "testFramework": "mocha"
+  },
   "dependencies": {
     "markdown": "0.5.0",
     "react": "19.1.0",

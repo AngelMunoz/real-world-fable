@@ -48,8 +48,11 @@ You're going to need a few things installed:
 
 ## Production Build
 
-- `dotnet perla build`
+- `perla build`
 
 ## Running the tests
 
-Pending...
+The Client Side tests run with Perla's test runner using mocha. For more information on the test runner see the Perla's [testing documentation](https://angelmunoz.github.io/Perla/#v1/docs/features/testing) to see the available support for testing client side code.
+
+- `perla test`
+- `perla test --watch --headless false`
