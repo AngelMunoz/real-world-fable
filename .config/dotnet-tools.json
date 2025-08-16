@@ -8,9 +8,9 @@
       "rollForward": false
     },
     "perla": {
-      "version": "1.0.0-beta-032",
+      "version": "1.0.0-rc-003",
       "commands": ["perla"],
-      "rollForward": false
+      "rollForward": true
     },
     "fantomas": {
       "version": "7.0.3",
